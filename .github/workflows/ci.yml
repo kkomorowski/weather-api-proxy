@@ -23,7 +23,7 @@ jobs:
         run: |
           set -euo pipefail
           curl -fL -o sbt.tgz https://github.com/sbt/sbt/releases/download/v1.12.1/sbt-1.12.1.tgz
-          untar -xzf sbt.tgz -C $HOME/.local/share/
+          tar -xzf sbt.tgz -C $HOME/.local/share/
           echo "$HOME/.local/share/sbt/bin" >> $GITHUB_PATH
 
       - name: Cache sbt, Ivy and Coursier
