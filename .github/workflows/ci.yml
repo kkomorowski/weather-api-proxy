@@ -22,8 +22,9 @@ jobs:
       - name: Install sbt
         run: |
           set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y sbt
+          curl -fL -o sbt.tgz https://github.com/sbt/sbt/releases/download/v1.12.1/sbt-1.12.1.tgz
+          untar -xzf sbt.tgz -C $HOME/.local/share/
+          echo "$HOME/.local/share/sbt/bin" >> $GITHUB_PATH
 
       - name: Cache sbt, Ivy and Coursier
         uses: actions/cache@v4
