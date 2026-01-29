@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Install sbt
+        run: |
+          set -euo pipefail
+          curl -fL -o sbt.tgz https://github.com/sbt/sbt/releases/download/v1.12.1/sbt-1.12.1.tgz
+          mkdir -p $HOME/.local/share/
+          tar -xzf sbt.tgz -C $HOME/.local/share/
+          echo "$HOME/.local/share/sbt/bin" >> $GITHUB_PATH
+
+      - name: Cache sbt, Ivy and Coursier
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.sbt
+            ~/.cache/coursier
+            ~/.coursier
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/build.sbt', '**/project/**/*.sbt', '**/project/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-
+
+      - name: Run sbt tests
+        run: sbt -no-colors -batch test
+        env:
+          CI: "true"
