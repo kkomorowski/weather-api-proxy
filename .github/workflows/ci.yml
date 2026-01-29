@@ -19,13 +19,11 @@ jobs:
           distribution: temurin
           java-version: '25'
 
-      - name: Install Coursier and sbt
+      - name: Install sbt
         run: |
           set -euo pipefail
-          curl -fL -o cs https://github.com/coursier/coursier/releases/latest/download/cs-x86_64-pc-linux
-          chmod +x cs
-          ./cs install sbt
-          echo "$HOME/.local/share/coursier/bin" >> $GITHUB_PATH
+          sudo apt-get update
+          sudo apt-get install -y sbt
 
       - name: Cache sbt, Ivy and Coursier
         uses: actions/cache@v4
