@@ -6,6 +6,24 @@ lazy val rootProject = (project in file(".")).settings(
     version := "0.1.0-SNAPSHOT",
     organization := "dev.hiquality.weather",
     scalaVersion := "3.7.4",
+    Compile / mainClass := Some("dev.hiquality.weather.Main"),
+
+    // Build a fat JAR with proper merge strategies
+    assembly / assemblyJarName := s"${name.value}-${version.value}.jar",
+    assembly / assemblyMergeStrategy := {
+      case PathList("META-INF", "maven", "org.webjars", "swagger-ui", "pom.properties") =>
+        MergeStrategy.singleOrError
+      case PathList("META-INF", "resources", "webjars", "swagger-ui", _*) =>
+        MergeStrategy.singleOrError
+      case PathList("META-INF", "services", _*) => MergeStrategy.concat
+      case PathList("META-INF", _*) => MergeStrategy.discard
+      case "module-info.class" => MergeStrategy.first
+      case x =>
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
+        oldStrategy(x)
+    },
+
+    // Dependencies
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server-zio" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-http4s-server" % tapirVersion,
