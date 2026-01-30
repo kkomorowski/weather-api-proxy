@@ -11,8 +11,9 @@ import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault, Console}
 object Main extends ZIOAppDefault:
 
   override def run: ZIO[Any & ZIOAppArgs & Scope, Any, Any] =
-
-    val routes = ZHttp4sServerInterpreter().from(Endpoints.all).toRoutes[Any]
+    
+    val endpoints = new Endpoints(TestWeatherService)
+    val routes = ZHttp4sServerInterpreter().from(endpoints.all).toRoutes[Any]
 
     val port = sys.env
       .get("HTTP_PORT")
