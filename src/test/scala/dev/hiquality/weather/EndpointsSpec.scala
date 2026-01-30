@@ -2,7 +2,6 @@ package dev.hiquality.weather
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.prop.TableDrivenPropertyChecks
 import sttp.client4.basicRequest
 import sttp.client4.UriContext
 import sttp.client4.circe.asJson
@@ -11,14 +10,16 @@ import org.scalatest.EitherValues
 import io.circe.generic.auto.*
 import sttp.client4.impl.zio.RIOMonadAsyncError
 import sttp.client4.testing.BackendStub
-import sttp.model.StatusCode.Ok
+import sttp.model.StatusCode.*
 import sttp.tapir.server.stub4.TapirStubInterpreter
 import zio.*
 
 class EndpointsSpec extends AnyFunSuite with Matchers with EitherValues:
 
+  private val endpoints = new Endpoints(TestWeatherService)
+
   private val backend = TapirStubInterpreter(BackendStub[Task](new RIOMonadAsyncError[Any]))
-    .whenServerEndpointRunLogic(Endpoints.weatherServerEndpoint)
+    .whenServerEndpointRunLogic(endpoints.weatherServerEndpoint)
     .backend()
 
   private def unsafeRun[A](program: Task[A]) =
@@ -29,8 +30,32 @@ class EndpointsSpec extends AnyFunSuite with Matchers with EitherValues:
   test("Weather endpoint returns actual conditions"):
     val response = unsafeRun:
       basicRequest
-        .get(uri"http://localhost:8080/weather")
+        .get(uri"http://localhost:8080/weather/27.6895/140.6917")
         .response(asJson[Conditions])
         .send(backend)
     response.code shouldBe Ok
-    response.body.value shouldBe Conditions(-13)
+    response.body.value shouldBe Conditions(-11.6)
+
+  test("Weather endpoint with out-of-bounds coordinates returns 400"):
+    val response = unsafeRun:
+      basicRequest
+        .get(uri"http://localhost:8080/weather/100.0/200.0")
+        .response(asJson[Conditions])
+        .send(backend)
+    response.code shouldBe BadRequest
+
+  test("Weather endpoint with invalid coordinates returns 400"):
+    val response = unsafeRun:
+      basicRequest
+        .get(uri"http://localhost:8080/weather/invalid/coordinates")
+        .response(asJson[Conditions])
+        .send(backend)
+    response.code shouldBe BadRequest
+
+  test("Weather endpoint without coordinates returns 404"):
+    val response = unsafeRun:
+      basicRequest
+        .get(uri"http://localhost:8080/weather/")
+        .response(asJson[Conditions])
+        .send(backend)
+    response.code shouldBe NotFound
