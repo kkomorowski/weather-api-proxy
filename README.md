@@ -32,3 +32,39 @@ Retrieve the current weather data for the specified latitude and longitude.
 - **Response:**
   - `200 OK`: Returns the weather data in JSON format.
   - `400 Bad Request`: Invalid latitude or longitude.
+  - `502 Bad Gateway`: Error fetching data from the weather API.
+
+## Example request to open-meteo.com API
+
+This application uses the Open-Meteo API to fetch weather data.
+For simplicity, it retrieves only the current temperature at 2 meters above ground level.
+
+To get the current temperature for a specific location (latitude: 51.76, longitude: 19.44), you can use the following `curl` command:
+
+```shell
+curl -s "https://api.open-meteo.com/v1/forecast?latitude=51.76&longitude=19.44&current=temperature_2m" | jq
+```
+
+Example response:
+
+```json
+{
+  "latitude": 51.764503,
+  "longitude": 19.453964,
+  "generationtime_ms": 0.0362396240234375,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 206.0,
+  "current_units": {
+    "time": "iso8601",
+    "interval": "seconds",
+    "temperature_2m": "°C"
+  },
+  "current": {
+    "time": "2026-02-15T23:00",
+    "interval": 900,
+    "temperature_2m": -7.2
+  }
+}
+```
