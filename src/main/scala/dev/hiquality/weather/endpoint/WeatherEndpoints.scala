@@ -1,18 +1,18 @@
-package dev.hiquality.weather
+package dev.hiquality.weather.endpoint
 
-import sttp.tapir.*
+import dev.hiquality.weather.model.Exceptions.*
+import dev.hiquality.weather.model.Weather.*
+import dev.hiquality.weather.service.WeatherService
 import io.circe.generic.auto.*
+import sttp.model.StatusCode
+import sttp.tapir.*
 import sttp.tapir.generic.auto.*
 import sttp.tapir.json.circe.*
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 import sttp.tapir.ztapir.ZServerEndpoint
-import zio.Task
-import zio.ZIO
-import Weather.*
-import dev.hiquality.weather.Exceptions.{DownstreamServiceException, GenericWeatherServiceException, InvalidCoordinatesException, WeatherServiceException}
-import sttp.model.StatusCode
+import zio.{Task, ZIO}
 
-class Endpoints(weatherService: WeatherService):
+class WeatherEndpoints(weatherService: WeatherService):
 
   // GET /weather/{latitude}/{longitude}
   private val weather: PublicEndpoint[(Latitude, Longitude), WeatherServiceException, Conditions, Any] = endpoint.get
@@ -75,31 +75,3 @@ class Endpoints(weatherService: WeatherService):
     .fromServerEndpoints[Task](apiEndpoints, "weather-api", "1.0.0")
 
   val all: List[ZServerEndpoint[Any, Any]] = apiEndpoints ++ docEndpoints
-
-object Weather:
-  type Latitude = Double
-  type Longitude = Double
-  case class Coordinates(latitude: Latitude, longitude: Longitude)
-  case class Conditions(temperature: Double)
-
-object Exceptions:
-  sealed trait WeatherServiceException extends Throwable
-  case class InvalidCoordinatesException(message: String) extends WeatherServiceException
-  case class GenericWeatherServiceException(message: String) extends WeatherServiceException
-  case class DownstreamServiceException(message: String) extends WeatherServiceException
-
-trait WeatherService:
-  def currentWeather(coordinates: Coordinates): Task[Conditions]
-  def validateCoordinates(coordinates: Coordinates): Task[Unit] =
-    if coordinates.latitude < -90.0 || coordinates.latitude > 90.0 ||
-       coordinates.longitude < -180.0 || coordinates.longitude > 180.0
-    then ZIO.fail(InvalidCoordinatesException(s"Invalid coordinates: ${coordinates.latitude}, ${coordinates.longitude}"))
-    else ZIO.unit
-
-object TestWeatherService extends WeatherService:
-  def currentWeather(coordinates: Coordinates): Task[Conditions] =
-    coordinates match
-      case Coordinates(lat, lon) if lat == 50 && lon == 0 =>
-        ZIO.fail(DownstreamServiceException("Simulated downstream service failure"))
-      case _ =>
-        ZIO.succeed(Conditions(Math.round(coordinates.latitude * 10 + coordinates.longitude * 10) % 400 / 10.0 - 20))

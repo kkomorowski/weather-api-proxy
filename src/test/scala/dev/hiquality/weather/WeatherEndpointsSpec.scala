@@ -1,12 +1,13 @@
 package dev.hiquality.weather
 
-import dev.hiquality.weather.Exceptions.DownstreamServiceException
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import sttp.client4.basicRequest
 import sttp.client4.UriContext
 import sttp.client4.circe.asJson
-import dev.hiquality.weather.Weather.*
+import dev.hiquality.weather.endpoint.WeatherEndpoints
+import dev.hiquality.weather.model.Weather.Conditions
+import dev.hiquality.weather.service.TestWeatherService
 import org.scalatest.EitherValues
 import io.circe.generic.auto.*
 import sttp.client4.impl.zio.RIOMonadAsyncError
@@ -15,9 +16,9 @@ import sttp.model.StatusCode.*
 import sttp.tapir.server.stub4.TapirStubInterpreter
 import zio.*
 
-class EndpointsSpec extends AnyFunSuite with Matchers with EitherValues:
+class WeatherEndpointsSpec extends AnyFunSuite with Matchers with EitherValues:
 
-  private val endpoints = new Endpoints(TestWeatherService)
+  private val endpoints = new WeatherEndpoints(TestWeatherService)
 
   private val backend = TapirStubInterpreter(BackendStub[Task](new RIOMonadAsyncError[Any]))
     .whenServerEndpointRunLogic(endpoints.weatherServerEndpoint)
