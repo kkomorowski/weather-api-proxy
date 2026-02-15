@@ -1,3 +1,6 @@
+addCommandAlias("format", "all scalafmtSbt scalafmt")
+addCommandAlias("formatCheck", "all scalafmtSbtCheck scalafmtCheck")
+
 val tapirVersion = "1.13.8"
 
 lazy val rootProject = (project in file(".")).settings(
@@ -39,3 +42,5 @@ lazy val rootProject = (project in file(".")).settings(
     testFrameworks := Seq(new TestFramework("org.scalatest.tools.Framework"))
   )
 )
+
+ThisBuild / scalafmtSbt := true
