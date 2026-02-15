@@ -39,6 +39,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-sbt-
 
+      - name: Run sbt formatCheck
+        run: sbt -no-colors -batch formatCheck
+        env:
+          CI: "true"
+
       - name: Run sbt tests
         run: sbt -no-colors -batch test
         env:
