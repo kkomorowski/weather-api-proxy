@@ -1,18 +1,20 @@
 package dev.hiquality.weather
 
 import com.comcast.ip4s.{Host, Port, port}
+import dev.hiquality.weather.endpoint.WeatherEndpoints
+import dev.hiquality.weather.service.TestWeatherService
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.Router
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.interop.catz.*
 import zio.stream.interop.fs2z.io.networkInstance
-import zio.{Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault, Console}
+import zio.{Console, Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 
 object Main extends ZIOAppDefault:
 
   override def run: ZIO[Any & ZIOAppArgs & Scope, Any, Any] =
     
-    val endpoints = new Endpoints(TestWeatherService)
+    val endpoints = new WeatherEndpoints(TestWeatherService)
     val routes = ZHttp4sServerInterpreter().from(endpoints.all).toRoutes[Any]
 
     val port = sys.env
