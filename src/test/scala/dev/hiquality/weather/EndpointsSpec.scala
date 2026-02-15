@@ -1,5 +1,6 @@
 package dev.hiquality.weather
 
+import dev.hiquality.weather.Exceptions.DownstreamServiceException
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
 import sttp.client4.basicRequest
@@ -59,3 +60,11 @@ class EndpointsSpec extends AnyFunSuite with Matchers with EitherValues:
         .response(asJson[Conditions])
         .send(backend)
     response.code shouldBe NotFound
+
+  test("Weather endpoint simulating downstream failure returns 502"):
+    val response = unsafeRun:
+      basicRequest
+        .get(uri"http://localhost:8080/weather/50.0/0.0")
+        .response(asJson[Conditions])
+        .send(backend)
+    response.code shouldBe BadGateway
