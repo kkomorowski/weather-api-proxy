@@ -13,9 +13,9 @@ import zio.{Console, Scope, Task, ZIO, ZIOAppArgs, ZIOAppDefault}
 object Main extends ZIOAppDefault:
 
   override def run: ZIO[Any & ZIOAppArgs & Scope, Any, Any] =
-    
+
     val endpoints = new WeatherEndpoints(TestWeatherService)
-    val routes = ZHttp4sServerInterpreter().from(endpoints.all).toRoutes[Any]
+    val routes    = ZHttp4sServerInterpreter().from(endpoints.all).toRoutes[Any]
 
     val port = sys.env
       .get("HTTP_PORT")
@@ -31,6 +31,8 @@ object Main extends ZIOAppDefault:
       .build
       .use: server =>
         for
-          _ <- Console.printLine(s"Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. Press ENTER key to exit.")
+          _ <- Console.printLine(
+            s"Go to http://localhost:${server.address.getPort}/docs to open SwaggerUI. Press ENTER key to exit."
+          )
           _ <- Console.readLine
         yield ()

@@ -9,5 +9,6 @@ trait WeatherService:
   def validateCoordinates(coordinates: Coordinates): Task[Unit] =
     if coordinates.latitude < -90.0 || coordinates.latitude > 90.0 ||
       coordinates.longitude < -180.0 || coordinates.longitude > 180.0
-    then ZIO.fail(InvalidCoordinatesException(s"Invalid coordinates: ${coordinates.latitude}, ${coordinates.longitude}"))
+    then
+      ZIO.fail(InvalidCoordinatesException(s"Invalid coordinates: ${coordinates.latitude}, ${coordinates.longitude}"))
     else ZIO.unit
