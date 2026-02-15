@@ -1,4 +1,4 @@
-val tapirVersion = "1.13.6"
+val tapirVersion = "1.13.8"
 
 lazy val rootProject = (project in file(".")).settings(
   Seq(
@@ -30,7 +30,7 @@ lazy val rootProject = (project in file(".")).settings(
       "org.http4s" %% "http4s-ember-server" % "0.23.33",
       "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-bundle" % tapirVersion,
       "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % tapirVersion,
-      "ch.qos.logback" % "logback-classic" % "1.5.27",
+      "ch.qos.logback" % "logback-classic" % "1.5.31",
       "com.softwaremill.sttp.tapir" %% "tapir-sttp-stub4-server" % tapirVersion % Test,
       "com.softwaremill.sttp.client4" %% "circe" % "4.0.15" % Test,
       "com.softwaremill.sttp.client4" %% "zio" % "4.0.15" % Test,
